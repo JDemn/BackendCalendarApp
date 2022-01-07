@@ -11,6 +11,9 @@ const app = express();
 //Directorio p[u]blico
 app.use(express.static('public')); //args = path de directorio publico
 
+//lectura y parseo del body
+app.use( express.json() );
+
 //RUTAS de mi aplicación 
 //enpoint para auth
 app.use('/api/auth', require('./routes/auth'));
