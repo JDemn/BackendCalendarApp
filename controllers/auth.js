@@ -1,19 +1,29 @@
-const { response, request } = require('express');
+const { response } = require('express');
+const { validationResult } = require('express-validator');
 
 const CREATE_USER = ( req, res = response)=>{  //express.response es para recuperar la ayuda del tipado de node
 
     const { name, email, password } = req.body;
 
-    if(name.length<5){
-        return res.status(400).json(
-            {
-                ok : false,
-                msj : "El nombre de usuario debe ser mayor a 5"
-            }
-        )
-    }
+    // if(name.length<5){
+    //     return res.status(400).json(
+    //         {
+    //             ok : false,
+    //             msj : "El nombre de usuario debe ser mayor a 5"
+    //         }
+    //     )
+    // }
+    //validaciones con express validator > manejo de errores con express validator
+    const errors = validationResult( req );
+    if( !errors.isEmpty() ){
+        return res.status( 400).json({
+            ok : false,
+            errors : errors.mapped()
+        });
+    } 
 
-    res.json({
+
+    res.status( 201 ).json({
         ok : true,
         msj :'new',
         name,
@@ -24,7 +34,17 @@ const CREATE_USER = ( req, res = response)=>{  //express.response es para recupe
 
 const USER_LOGIN = ( req, res = response )=>{
     const { email, password } = req.body;
-    res.json({
+    const errors = validationResult( req );
+
+    //si hay errores en la petición
+    if(!errors.isEmpty()){
+        return res.status( 400 ).json({
+            ok: false,
+            errors : errors.mapped(),
+        });
+    }
+
+    res.status( 201 ).json({
         ok : true,
         msg : 'login',
         email,
