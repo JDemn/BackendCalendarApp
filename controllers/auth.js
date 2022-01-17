@@ -1,12 +1,13 @@
 const { response } = require('express');
 const Usuario = require('../model/Usuario'); //vamos usar el modelo de db
 
-const CREATE_USER = (req, res = response) => {  //express.response es para recuperar la ayuda del tipado de node
+const CREATE_USER = async (req, res = response) => {  //express.response es para recuperar la ayuda del tipado de node
     const { name, email, password } = req.body;
     try {
         
-        let usuario = Usuario.findOne({email:email});
-        console.log(usuario)
+        let usuario = await Usuario.findOne({email}).exec();
+        
+        console.log(Usuario.findOne({email, name}));
         if(usuario){
             return res.status( 400 ).json({
                 ok : false,
@@ -19,7 +20,8 @@ const CREATE_USER = (req, res = response) => {  //express.response es para recup
         //validaciones con express validator > manejo de errores con express validator. all in middlewares   
         res.status(201).json({
             ok: true,
-            msj: 'new',
+            uid: usuario.id,
+            name : usuario.name
         });
     } catch (error) {
         console.log(error);
