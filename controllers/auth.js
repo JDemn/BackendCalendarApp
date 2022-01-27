@@ -2,7 +2,7 @@ const { response } = require('express');
 const Usuario = require('../model/Usuario'); //vamos usar el modelo de db
 const bcrypt = require('bcryptjs');
 const { off } = require('../model/Usuario');
-
+const { createJWT } = require('../helpers/jwt');
 const CREATE_USER = async (req, res = response) => {  //express.response es para recuperar la ayuda del tipado de node
     const { name, email, password } = req.body;
     try {
@@ -23,12 +23,17 @@ const CREATE_USER = async (req, res = response) => {  //express.response es para
 
         usuario.save();
         
+        //Create JWT
+        const token = await createJWT( usuario.id, usuario.name );
+
         //validaciones con express validator > manejo de errores con express validator. all in middlewares   
         res.status(201).json({
             ok: true,
             uid: usuario.id,
-            name : usuario.name
+            name : usuario.name,
+            token,
         });
+
     } catch (error) {
         console.log(error);
         res.status( 500).json({
@@ -51,18 +56,21 @@ const USER_LOGIN = async (req, res = response) => {
         } 
 
         //comparar password del login con password que existe en la base de datos
-        const validPass = bcrypt.compareSync( email, usuario.password ); //true / false
+        const validPass = bcrypt.compareSync( password, usuario.password ); //true / false
         if( !validPass ){
             res.status( 400 ).json({
                 ok : false,
                 msj : 'password incorrecto',
             })
         }
-        //JWT
+        //Create JWT
+        const token = await createJWT( usuario.id, usuario.name );
+
         res.json({
             ok: true,
             uid : usuario.id,
             name : usuario.name,
+            token,
         })
         
     } catch ( error ) {
