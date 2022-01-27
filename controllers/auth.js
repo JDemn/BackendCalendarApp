@@ -3,6 +3,8 @@ const Usuario = require('../model/Usuario'); //vamos usar el modelo de db
 const bcrypt = require('bcryptjs');
 const { off } = require('../model/Usuario');
 const { createJWT } = require('../helpers/jwt');
+
+
 const CREATE_USER = async (req, res = response) => {  //express.response es para recuperar la ayuda del tipado de node
     const { name, email, password } = req.body;
     try {
